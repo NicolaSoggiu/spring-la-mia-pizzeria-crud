@@ -5,7 +5,7 @@
 <nav th:replace="fragments/navbar :: topNavbar('pizzas')"></nav>
 <div class="container">
     <h1 class="text-center m-3">Menu</h1>
-    <div class="row">
+    <div th:if="${pizzaList.size() > 0}" class="row">
         <div th:each="pizza : ${pizzaList}" th:object="${pizza}" class="col-md-4 my-2">
             <div class="card h-100" style="width: 18rem;">
                 <img th:src="*{image}" alt="Pizza Image" class="card-img-top img-fluid h-50">
@@ -16,6 +16,9 @@
                 </div>
             </div>
         </div>
+    </div>
+    <div th:unless="${pizzaList.size() > 0}">
+        <h1 class="text-center m-5">No pizza found</h1>
     </div>
 </div>
 </body>
