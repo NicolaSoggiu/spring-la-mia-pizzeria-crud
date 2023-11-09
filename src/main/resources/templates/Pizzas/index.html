@@ -1,8 +1,8 @@
 <!doctype html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head th:insert="fragments/resources :: headResources('Pizza List')"></head>
-
 <body>
+<nav th:replace="fragments/navbar :: topNavbar('pizzas')"></nav>
 <div class="container">
     <h1 class="text-center m-3">Menu</h1>
     <div class="row">
