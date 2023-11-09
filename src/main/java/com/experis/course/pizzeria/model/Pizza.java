@@ -2,6 +2,7 @@ package com.experis.course.pizzeria.model;
 
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -15,7 +16,7 @@ public class Pizza {
     private String name;
     private String description;
     private String image;
-    private double price;
+    private BigDecimal price;
     private LocalDateTime createdAt;
 
     // GETTER E SETTER
@@ -53,12 +54,12 @@ public class Pizza {
         this.image = url;
     }
 
-    public double getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
     public void setPrice(double price) {
-        this.price = price;
+        this.price = BigDecimal.valueOf(price);
     }
 
     public LocalDateTime getCreatedAt() {
