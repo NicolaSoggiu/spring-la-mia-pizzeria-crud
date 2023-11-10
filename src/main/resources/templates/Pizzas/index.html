@@ -3,23 +3,34 @@
 <head th:insert="fragments/resources :: headResources('Pizza List')"></head>
 <body>
 <nav th:replace="fragments/navbar :: topNavbar('pizzas')"></nav>
-<div class="container">
-    <h1 class="text-center m-3">Menu</h1>
-    <div th:if="${pizzaList.size() > 0}" class="row">
-        <div th:each="pizza : ${pizzaList}" th:object="${pizza}" class="col-md-4 my-2">
-            <div class="card h-100" style="width: 18rem;">
-                <img th:src="*{image}" alt="Pizza Image" class="card-img-top img-fluid h-50">
-                <div class="card-body">
-                    <h5 th:text="*{name}" class="card-title"></h5>
-                    <p th:text="*{description}" class="card-text"></p>
-                    <span th:text="'€ ' + *{price}"></span>
-                </div>
-            </div>
-        </div>
+<div class="m-2">
+    <div class="d-flex align-items-center justify-content-between">
+        <h1>Pizza List</h1>
     </div>
-    <div th:unless="${pizzaList.size() > 0}">
-        <h1 class="text-center m-5">No pizza found</h1>
-    </div>
+
+    <hr>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Image</th>
+            <th>Price</th>
+            <th>Info</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="pizza : ${pizzaList}" th:object="${pizza}">
+            <td th:text="*{name}"></td>
+            <td th:text="*{description}"></td>
+            <td><img class="d-block h-25 w-25" th:src="*{image}"></td>
+            <td th:text="*{price}"></td>
+            <td>
+                <a th:href="@{/pizzas/show/{id}(id=*{id})}" title="details"><i class="fa-solid fa-book"></i></a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
 </div>
 </body>
 </html>

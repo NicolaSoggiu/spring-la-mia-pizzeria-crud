@@ -1,0 +1,11 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:insert="fragments/resources :: headResources('Error')"></head>
+<body>
+<div class="container">
+    <h1>OOOPS AN ERROR OCCURRED</h1>
+    <div th:insert="fragments/resources :: errorDetails"></div>
+    <a th:href="@{/pizzas}" class="btn btn-primary my-3">Back to list</a>
+</div>
+</body>
+</html>
