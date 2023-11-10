@@ -3,11 +3,22 @@
 <head th:insert="fragments/resources :: headResources('Pizza List')"></head>
 <body>
 <nav th:replace="fragments/navbar :: topNavbar('pizzas')"></nav>
-<div class="m-2">
+<div class="container">
     <div class="d-flex align-items-center justify-content-between">
         <h1>Pizza List</h1>
-    </div>
+        <form th:action="@{/pizzas}" method="GET">
+            <div class="input-group">
+                <input
+                        type="text"
+                        placeholder="Search by name"
+                        class="form-control" name="search"
+                        th:value="${param.search}"
+                >
+                <button class="btn btn-primary" type="submit">Search</button>
+            </div>
 
+        </form>
+    </div>
     <hr>
     <table class="table">
         <thead>
@@ -26,7 +37,8 @@
             <td><img class="d-block h-25 w-25" th:src="*{image}"></td>
             <td th:text="*{price}"></td>
             <td>
-                <a th:href="@{/pizzas/show/{id}(id=*{id})}" title="details"><i class="fa-solid fa-book"></i></a>
+                <a th:href="@{/pizzas/show/{id}(id=*{id})}" title="details"><i class="fa-solid fa-utensils"
+                                                                               style="color: #000000;"></i></a>
             </td>
         </tr>
         </tbody>
