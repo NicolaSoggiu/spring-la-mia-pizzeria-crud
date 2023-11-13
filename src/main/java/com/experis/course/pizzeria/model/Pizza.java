@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import org.hibernate.annotations.CreationTimestamp;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -18,7 +19,7 @@ public class Pizza {
     private Integer id;
 
     @NotBlank(message = "Name must not be blank!")
-    @Size(max = 255)
+    @Size(max = 50)
     @Column(unique = true)
     private String name;
 
@@ -31,7 +32,7 @@ public class Pizza {
     private String image;
 
     @DecimalMin(value = "0.1", message = "The price must not be less than 0.00!")
-    private Double price;
+    private BigDecimal price;
 
     @CreationTimestamp
     private LocalDateTime createdAt;
@@ -71,12 +72,12 @@ public class Pizza {
         this.image = url;
     }
 
-    public Double getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(double price) {
-        this.price = Double.valueOf(price);
+    public void setPrice(BigDecimal price) {
+        this.price = price;
     }
 
     public LocalDateTime getCreatedAt() {
