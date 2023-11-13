@@ -2,10 +2,13 @@ package com.experis.course.pizzeria.controller;
 
 import com.experis.course.pizzeria.model.Pizza;
 import com.experis.course.pizzeria.repository.PizzaRepository;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -45,9 +48,19 @@ public class PizzaController {
     }
 
     @PostMapping("/create")
-    public String doCreate(Pizza formPizza) {
-        Pizza savePizza = null;
-        savePizza = pizzaRepository.save(formPizza);
-        return "redirect:/pizzas/show/" + savePizza.getId();
+    public String doCreate(@Valid @ModelAttribute("pizza") Pizza formPizza, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return "pizzas/create";
+        }
+        Pizza savedPizza = null;
+        try {
+            savedPizza = pizzaRepository.save(formPizza);
+        } catch (RuntimeException e) {
+            bindingResult.addError(new FieldError("pizza", "name", formPizza.getName(),
+                    false, null, null,
+                    "Already exist a pizza with this name!"));
+            return "pizzas/create";
+        }
+        return "redirect:/pizzas/show/" + savedPizza.getId();
     }
 }

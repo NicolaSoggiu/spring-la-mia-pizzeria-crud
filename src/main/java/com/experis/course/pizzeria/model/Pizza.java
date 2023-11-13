@@ -1,8 +1,11 @@
 package com.experis.course.pizzeria.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+import org.hibernate.annotations.CreationTimestamp;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -13,10 +16,24 @@ public class Pizza {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
+    @NotBlank(message = "Name must not be blank!")
+    @Size(max = 255)
+    @Column(unique = true)
     private String name;
+
+    @NotBlank(message = "Description must not be blank!")
+    @Size(max = 255)
     private String description;
+
+    @NotBlank(message = "The image must not be blank!")
+    @Size(max = 255)
     private String image;
-    private BigDecimal price;
+
+    @DecimalMin(value = "0.1", message = "The price must not be less than 0.00!")
+    private Double price;
+
+    @CreationTimestamp
     private LocalDateTime createdAt;
 
     // GETTER E SETTER
@@ -54,12 +71,12 @@ public class Pizza {
         this.image = url;
     }
 
-    public BigDecimal getPrice() {
+    public Double getPrice() {
         return price;
     }
 
     public void setPrice(double price) {
-        this.price = BigDecimal.valueOf(price);
+        this.price = Double.valueOf(price);
     }
 
     public LocalDateTime getCreatedAt() {
