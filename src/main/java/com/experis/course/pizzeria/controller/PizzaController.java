@@ -1,7 +1,9 @@
 package com.experis.course.pizzeria.controller;
 
+import com.experis.course.pizzeria.exception.NameUniqueException;
+import com.experis.course.pizzeria.exception.PizzaNotFoundException;
 import com.experis.course.pizzeria.model.Pizza;
-import com.experis.course.pizzeria.repository.PizzaRepository;
+import com.experis.course.pizzeria.service.PizzaService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,33 +15,30 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.List;
 import java.util.Optional;
 
 @Controller
 @RequestMapping("/pizzas")
 public class PizzaController {
+
     @Autowired
-    private PizzaRepository pizzaRepository;
+    private PizzaService pizzaService;
 
     @GetMapping
     public String index(@RequestParam Optional<String> search, Model model) {
-        List<Pizza> pizzaList;
-        if (search.isPresent()) {
-            pizzaList = pizzaRepository.findByNameContainingIgnoreCase(search.get());
-        } else {
-            pizzaList = pizzaRepository.findAll();
-        }
-        model.addAttribute("pizzaList", pizzaList);
+        model.addAttribute("pizzaList", pizzaService.getPizzaList(search));
         return "pizzas/index";
     }
 
     @GetMapping("/show/{id}")
     public String show(@PathVariable Integer id, Model model) {
-        model.addAttribute("pizza", pizzaRepository.findById(id).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "The pizza with id " + id + " doesn't exist!")));
-        return "pizzas/show";
+        try {
+            Pizza pizza = pizzaService.getPizzaById(id);
+            model.addAttribute("pizza", pizza);
+            return "pizzas/show";
+        } catch (PizzaNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        }
     }
 
     @GetMapping("/create")
@@ -53,26 +52,24 @@ public class PizzaController {
         if (bindingResult.hasErrors()) {
             return "pizzas/form";
         }
-        Pizza savedPizza = null;
         try {
-            savedPizza = pizzaRepository.save(formPizza);
-        } catch (RuntimeException e) {
+            Pizza savedPizza = pizzaService.createPizza(formPizza);
+            return "redirect:/pizzas/show/" + savedPizza.getId();
+        } catch (NameUniqueException e) {
             bindingResult.addError(new FieldError("pizza", "name", formPizza.getName(),
                     false, null, null,
                     "Already exist a pizza with this name!"));
             return "pizzas/form";
         }
-        return "redirect:/pizzas/show/" + savedPizza.getId();
     }
 
     @GetMapping("/edit/{id}")
     public String edit(@PathVariable Integer id, Model model) {
-        Optional<Pizza> result = pizzaRepository.findById(id);
-        if (result.isPresent()) {
-            model.addAttribute("pizza", result.get());
+        try {
+            model.addAttribute("pizza", pizzaService.getPizzaById(id));
             return "pizzas/form";
-        } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Pizza with id " + id + " not found!");
+        } catch (PizzaNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         }
     }
 
@@ -81,22 +78,23 @@ public class PizzaController {
         if (bindingResult.hasErrors()) {
             return "pizzas/form";
         }
-        Pizza pizzaToEdit = pizzaRepository.findById(id).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND));
-        pizzaToEdit.setName(formPizza.getName());
-        pizzaToEdit.setDescription(formPizza.getDescription());
-        pizzaToEdit.setImage(formPizza.getImage());
-        pizzaToEdit.setPrice(formPizza.getPrice());
-        Pizza savedPizza = pizzaRepository.save(pizzaToEdit);
-        return "redirect:/pizzas/show/" + savedPizza.getId();
+        try {
+            Pizza savedPizza = pizzaService.editPizza(formPizza);
+            return "redirect:/pizzas/show/" + savedPizza.getId();
+        } catch (PizzaNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        }
     }
 
     @PostMapping("/delete/{id}")
     public String delete(@PathVariable Integer id, RedirectAttributes redirectAttributes) {
-        Pizza pizzaToDelete = pizzaRepository.findById(id).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND));
-        pizzaRepository.deleteById(id);
-        redirectAttributes.addFlashAttribute("message", "Pizza " + pizzaToDelete.getName() + " deleted!");
-        return "redirect:/pizzas";
+        try {
+            Pizza pizzaToDelete = pizzaService.getPizzaById(id);
+            pizzaService.deletePizza(id);
+            redirectAttributes.addFlashAttribute("message", "Pizza " + pizzaToDelete.getName() + " deleted!");
+            return "redirect:/pizzas";
+        } catch (PizzaNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        }
     }
 }
