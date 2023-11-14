@@ -11,6 +11,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 import java.util.Optional;
@@ -88,5 +89,14 @@ public class PizzaController {
         pizzaToEdit.setPrice(formPizza.getPrice());
         Pizza savedPizza = pizzaRepository.save(pizzaToEdit);
         return "redirect:/pizzas/show/" + savedPizza.getId();
+    }
+
+    @PostMapping("/delete/{id}")
+    public String delete(@PathVariable Integer id, RedirectAttributes redirectAttributes) {
+        Pizza pizzaToDelete = pizzaRepository.findById(id).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND));
+        pizzaRepository.deleteById(id);
+        redirectAttributes.addFlashAttribute("message", "Pizza " + pizzaToDelete.getName() + " deleted!");
+        return "redirect:/pizzas";
     }
 }
