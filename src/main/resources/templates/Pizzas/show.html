@@ -5,6 +5,7 @@
 <nav th:replace="fragments/navbar :: topNavbar('pizzas')"></nav>
 <div class="container">
     <div th:object="${pizza}" class="col-md-4 my-5">
+        <h1 th:text="*{name}"></h1>
         <div class="card h-100" style="width: 18rem;">
             <img th:src="*{image}" alt="Pizza Image" class="card-img-top img-fluid h-50">
             <div class="card-body">

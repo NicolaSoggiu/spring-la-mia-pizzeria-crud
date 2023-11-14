@@ -44,13 +44,13 @@ public class PizzaController {
     @GetMapping("/create")
     public String create(Model model) {
         model.addAttribute("pizza", new Pizza());
-        return "pizzas/create";
+        return "pizzas/form";
     }
 
     @PostMapping("/create")
     public String doCreate(@Valid @ModelAttribute("pizza") Pizza formPizza, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            return "pizzas/create";
+            return "pizzas/form";
         }
         Pizza savedPizza = null;
         try {
@@ -59,8 +59,34 @@ public class PizzaController {
             bindingResult.addError(new FieldError("pizza", "name", formPizza.getName(),
                     false, null, null,
                     "Already exist a pizza with this name!"));
-            return "pizzas/create";
+            return "pizzas/form";
         }
+        return "redirect:/pizzas/show/" + savedPizza.getId();
+    }
+
+    @GetMapping("/edit/{id}")
+    public String edit(@PathVariable Integer id, Model model) {
+        Optional<Pizza> result = pizzaRepository.findById(id);
+        if (result.isPresent()) {
+            model.addAttribute("pizza", result.get());
+            return "pizzas/form";
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Pizza with id " + id + " not found!");
+        }
+    }
+
+    @PostMapping("/edit/{id}")
+    public String doEdit(@PathVariable Integer id, @Valid @ModelAttribute("pizza") Pizza formPizza, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return "pizzas/form";
+        }
+        Pizza pizzaToEdit = pizzaRepository.findById(id).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND));
+        pizzaToEdit.setName(formPizza.getName());
+        pizzaToEdit.setDescription(formPizza.getDescription());
+        pizzaToEdit.setImage(formPizza.getImage());
+        pizzaToEdit.setPrice(formPizza.getPrice());
+        Pizza savedPizza = pizzaRepository.save(pizzaToEdit);
         return "redirect:/pizzas/show/" + savedPizza.getId();
     }
 }

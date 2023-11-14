@@ -30,7 +30,7 @@
             <th>Description</th>
             <th>Image</th>
             <th>Price</th>
-            <th>Info</th>
+            <th></th>
         </tr>
         </thead>
         <tbody>
@@ -39,9 +39,11 @@
             <td th:text="*{description}"></td>
             <td><img class="d-block h-25 w-25" th:src="*{image}"></td>
             <td th:text="*{price}"></td>
-            <td>
-                <a th:href="@{/pizzas/show/{id}(id=*{id})}" title="details"><i class="fa-solid fa-utensils"
-                                                                               style="color: #000000;"></i></a>
+            <td class="d-flex align-items-center justify-content-between">
+                <a class="btn btn-dark" th:href="@{/pizzas/show/{id}(id=*{id})}" title="details"><i
+                        class="fa-solid fa-utensils"></i></a>
+                <a class="btn btn-dark" th:href="@{/pizzas/edit/{id}(id=*{id})}" title="edit"><i
+                        class="fa-solid fa-pen-to-square"></i></a>
             </td>
         </tr>
         </tbody>
